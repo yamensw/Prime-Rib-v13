@@ -309,4 +309,63 @@
   // ---------------------------
   // Typing animation for hero text
   // ---------------------------
-  function init
+  function initTypewriter() {
+    const heroH1 = document.querySelector('.hero .h1');
+    if (!heroH1 || prefersReducedMotion) return;
+    
+    const text = heroH1.textContent;
+    heroH1.textContent = '';
+    
+    let i = 0;
+    const typeWriter = () => {
+      if (i < text.length) {
+        heroH1.textContent += text.charAt(i);
+        i++;
+        setTimeout(typeWriter, 40);
+      }
+    };
+    
+    // Start typing after 1 second
+    setTimeout(typeWriter, 1000);
+  }
+
+  // ---------------------------
+  // Initialize all animations
+  // ---------------------------
+  function initAnimations() {
+    if (!prefersReducedMotion) {
+      initStaggeredCards();
+      initScrollProgress();
+      
+      // Only run tilt effect on desktop
+      if (window.innerWidth >= 768) {
+        setTimeout(initTiltEffect, 1000);
+      }
+      
+      // Only run typewriter on homepage
+      if (window.location.pathname === '/' || window.location.pathname.endsWith('index.html')) {
+        initTypewriter();
+      }
+    }
+  }
+
+  // Call initialization after DOM loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAnimations);
+  } else {
+    initAnimations();
+  }
+
+  // Reinitialize tilt effect on resize (for switching between mobile/desktop)
+  window.addEventListener('resize', () => {
+    if (!prefersReducedMotion && window.innerWidth >= 768) {
+      // Remove any existing tilt effects and reinitialize
+      const cards = $$('.glass.card');
+      cards.forEach(card => {
+        card.style.transform = '';
+      });
+      initTiltEffect();
+    }
+  });
+
+})();
